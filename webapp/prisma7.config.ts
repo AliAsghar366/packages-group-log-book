@@ -3,12 +3,27 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// `prisma migrate deploy` refuses to run when the datasource URL is undefined,
+// which crash-loops the container on a host that has not configured one. Fall
+// back to the same local SQLite file the app itself uses (see app/lib/prisma.ts)
+// so the service always boots -- but warn, because that file is on the
+// container's ephemeral disk and is lost on every redeploy.
+const databaseUrl = process.env["DATABASE_URL"] ?? "file:./dev.db";
+
+if (!process.env["DATABASE_URL"]) {
+  console.warn(
+    "[prisma] DATABASE_URL is not set. Falling back to a local SQLite file " +
+      "that will NOT survive a redeploy. Set DATABASE_URL to a path on a " +
+      "persistent volume (for example file:/data/prod.db) to keep data.",
+  );
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: databaseUrl,
   },
 });

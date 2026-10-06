@@ -48,7 +48,9 @@ If you would rather build the app directory directly, set:
 Either way the service needs:
 
 1. **Variables**: `DATABASE_URL` — an absolute SQLite path on the mounted volume, e.g.
-   `file:/data/prod.db`
+   `file:/data/prod.db`. If it is unset the app falls back to a local `dev.db` inside the
+   container: it still boots and migrates, but logs a warning and loses every record on
+   the next deploy.
 2. **Volumes**: mount a volume at `/data` so the database survives redeploys
 3. **Networking**: expose port `3000` (Railway injects `PORT`, which `next start` honours)
 
