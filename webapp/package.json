@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "postinstall": "prisma generate",
+    "start": "prisma migrate deploy && next start",
+    "db:migrate": "prisma migrate deploy",
     "lint": "eslint",
     "import:historical": "tsx scripts/import-historical.ts"
   },
