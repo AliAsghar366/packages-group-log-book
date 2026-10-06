@@ -37,15 +37,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Deploy on Railway
 
-The app lives in the `webapp/` folder of the repository, so the Railway service has to be
-pointed at it. Without this, the builder only sees the repo root (spreadsheets and PDFs)
-and fails with *"Railpack could not determine how to build the app"*.
+The repository root carries a thin build shim (`package.json` + `railpack.json`) that
+installs and runs the app in `webapp/`, so a Railway service builds straight from the
+repo root with no configuration. Without it the builder only sees the spreadsheets and
+PDFs and fails with *"Railpack could not determine how to build the app"*.
 
-1. **Settings → Source → Root Directory**: `webapp`
-2. **Variables**: `DATABASE_URL` — an absolute SQLite path on the mounted volume, e.g.
+If you would rather build the app directory directly, set:
+**Settings → Source → Root Directory** = `webapp` — the root shim is then ignored.
+
+Either way the service needs:
+
+1. **Variables**: `DATABASE_URL` — an absolute SQLite path on the mounted volume, e.g.
    `file:/data/prod.db`
-3. **Volumes**: mount a volume at `/data` so the database survives redeploys
-4. **Networking**: expose port `3000` (Railway injects `PORT`, which `next start` honours)
+2. **Volumes**: mount a volume at `/data` so the database survives redeploys
+3. **Networking**: expose port `3000` (Railway injects `PORT`, which `next start` honours)
 
 No custom build or start command is needed — the `package.json` scripts cover it:
 

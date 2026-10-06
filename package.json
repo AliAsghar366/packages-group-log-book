@@ -1,0 +1,16 @@
+{
+  "name": "packages-group-log-book",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build shim for hosts that build from the repo root. The Next.js app itself lives in webapp/.",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "postinstall": "cd webapp && npm ci",
+    "dev": "cd webapp && npm run dev",
+    "build": "cd webapp && npm run build",
+    "start": "cd webapp && npm run start",
+    "db:migrate": "cd webapp && npm run db:migrate"
+  }
+}

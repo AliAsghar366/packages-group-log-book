@@ -3,6 +3,9 @@
 Thumbs.db
 desktop.ini
 
+# root install (build shim only -- the real dependencies live in webapp/)
+/node_modules/
+
 # --- webapp (Next.js) build + dependency artifacts ---
 webapp/node_modules/
 webapp/.next/
