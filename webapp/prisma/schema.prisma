@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Category and status are plain strings (not Prisma enums) so the same
+// schema works unchanged on SQLite (local/dev) and Postgres (hosted) --
+// SQLite has no native enum support. Valid values are enforced in the
+// app layer (see app/lib/constants.ts).
+
+model Vendor {
+  id         String           @id @default(cuid())
+  name       String           @unique
+  logEntries LogEntry[]
+  issuances  IssuanceRecord[]
+  createdAt  DateTime         @default(now())
+}
+
+model Machine {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  logEntries LogEntry[]
+  createdAt  DateTime   @default(now())
+}
+
+model LogEntry {
+  id       String   @id @default(cuid())
+  category String // "PAPER_QUALITY" | "EQUIPMENT_PROCESS"
+  date     DateTime // event date (paper quality) / breakdown date (equipment)
+
+  // Paper Quality fields
+  vendorId        String?
+  vendor          Vendor? @relation(fields: [vendorId], references: [id])
+  issueType       String? // e.g. "Side Cuts", "Joint Break/Improper Joint"
+  downtimeMinutes Float?
+  stopsCount      Int?
+
+  // Equipment / Process fields (3-stage lifecycle: OPEN -> TEMP_FIXED -> RESOLVED)
+  machineId        String?
+  machine          Machine?  @relation(fields: [machineId], references: [id])
+  status           String? // "OPEN" | "TEMP_FIXED" | "RESOLVED"
+  startTime        DateTime?
+  tempFixedTime    DateTime?
+  resolvedTime     DateTime?
+  immediateAction  String?
+  rootCause        String?
+  correctiveAction String?
+  resultsSummary   String?
+
+  // Shared
+  description String?
+  preparedBy  String?
+  photos      Photo[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, date])
+  @@index([vendorId])
+  @@index([machineId])
+}
+
+model Photo {
+  id         String   @id @default(cuid())
+  logEntryId String
+  logEntry   LogEntry @relation(fields: [logEntryId], references: [id], onDelete: Cascade)
+  url        String
+  caption    String?
+  createdAt  DateTime @default(now())
+
+  @@index([logEntryId])
+}
+
+model IssuanceRecord {
+  id          String   @id @default(cuid())
+  date        DateTime
+  vendorId    String
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
+  description String?
+  netQty      Float
+  deckle      Int?
+  paperType   String?
+  createdAt   DateTime @default(now())
+
+  @@index([vendorId, date])
+}

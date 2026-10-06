@@ -1,0 +1,33 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- webapp (Next.js) build + dependency artifacts ---
+webapp/node_modules/
+webapp/.next/
+webapp/out/
+webapp/build/
+webapp/coverage/
+
+# local env + local SQLite database (never source control)
+webapp/.env
+webapp/.env.*
+webapp/dev.db
+
+# Prisma client generated on install
+webapp/app/generated/prisma/
+
+# user-uploaded photos (local-disk prototype storage)
+webapp/public/uploads/
+
+# auto-regenerated tooling scaffolding
+webapp/AGENTS.md
+webapp/CLAUDE.md
+webapp/.claude/
+webapp/.agents/
+webapp/.windsurf/
+
+# typescript build info
+webapp/next-env.d.ts
+webapp/*.tsbuildinfo
